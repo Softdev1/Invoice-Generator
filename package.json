@@ -1,0 +1,24 @@
+{
+  "name": "invoice-generator",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "worker",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "npm --workspace=client run dev",
+    "dev:server": "npm --workspace=server run dev",
+    "dev:worker": "npm --workspace=worker run dev",
+    "build": "npm --workspace=shared run build && npm --workspace=client run build && npm --workspace=server run build && npm --workspace=worker run build",
+    "lint": "npm --workspaces run lint",
+    "test": "npm --workspaces run test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.0"
+  }
+}
