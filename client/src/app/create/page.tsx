@@ -30,7 +30,12 @@ export interface InvoiceFormData {
   note?: string;
 }
 
-const STEPS = ['Business', 'Customer', 'Items', 'Review'] as const;
+const STEPS = [
+  { label: 'Business', icon: '🏪' },
+  { label: 'Customer', icon: '👤' },
+  { label: 'Items', icon: '📝' },
+  { label: 'Review', icon: '✅' },
+] as const;
 
 export default function CreateInvoicePage() {
   const [step, setStep] = useState(0);
@@ -51,44 +56,58 @@ export default function CreateInvoicePage() {
 
   return (
     <div>
-      {/* Progress bar */}
-      <div className="mb-6">
-        <div className="flex justify-between mb-2">
-          {STEPS.map((label, i) => (
-            <span
-              key={label}
-              className={`text-xs font-medium ${i <= step ? 'text-primary-600' : 'text-gray-400'}`}
-            >
-              {label}
-            </span>
+      {/* Progress indicator */}
+      <div className="mb-8 animate-fade-in-up">
+        <div className="flex items-center justify-between mb-4">
+          {STEPS.map((s, i) => (
+            <div key={s.label} className="flex items-center">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className={`
+                  w-11 h-11 rounded-2xl flex items-center justify-center text-lg
+                  transition-all duration-300
+                  ${i < step ? 'bg-slate-800 text-white shadow-md' : ''}
+                  ${i === step ? 'bg-amber-400 text-slate-900 shadow-lg scale-110' : ''}
+                  ${i > step ? 'bg-slate-100 text-slate-400' : ''}
+                `}>
+                  {i < step ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <span>{s.icon}</span>
+                  )}
+                </div>
+                <span className={`text-[11px] font-semibold tracking-wide ${
+                  i <= step ? 'text-slate-700' : 'text-slate-400'
+                }`}>
+                  {s.label}
+                </span>
+              </div>
+              {i < STEPS.length - 1 && (
+                <div className={`w-8 sm:w-12 h-0.5 mx-1 mt-[-18px] rounded-full transition-colors duration-300 ${
+                  i < step ? 'bg-slate-800' : 'bg-slate-200'
+                }`} />
+              )}
+            </div>
           ))}
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-          />
         </div>
       </div>
 
       {/* Steps */}
-      {step === 0 && (
-        <BusinessStep data={formData.business} onChange={(business) => updateFormData({ business })} onNext={next} />
-      )}
-      {step === 1 && (
-        <CustomerStep data={formData.customer} onChange={(customer) => updateFormData({ customer })} onNext={next} onBack={back} />
-      )}
-      {step === 2 && (
-        <ItemsStep
-          data={formData}
-          onChange={updateFormData}
-          onNext={next}
-          onBack={back}
-        />
-      )}
-      {step === 3 && (
-        <ReviewStep data={formData} onBack={back} />
-      )}
+      <div className="animate-slide-in" key={step}>
+        {step === 0 && (
+          <BusinessStep data={formData.business} onChange={(business) => updateFormData({ business })} onNext={next} />
+        )}
+        {step === 1 && (
+          <CustomerStep data={formData.customer} onChange={(customer) => updateFormData({ customer })} onNext={next} onBack={back} />
+        )}
+        {step === 2 && (
+          <ItemsStep data={formData} onChange={updateFormData} onNext={next} onBack={back} />
+        )}
+        {step === 3 && (
+          <ReviewStep data={formData} onBack={back} />
+        )}
+      </div>
     </div>
   );
 }

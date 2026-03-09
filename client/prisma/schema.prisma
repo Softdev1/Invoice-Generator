@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(200)
+  logo_url     String?
+  phone        String?  @db.VarChar(20)
+  email        String?  @db.VarChar(200)
+  address      String?  @db.VarChar(500)
+  currency     String   @default("NGN") @db.VarChar(5)
+  default_note String?  @db.VarChar(1000)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  customers Customer[]
+  invoices  Invoice[]
+  uploads   Upload[]
+
+  @@map("businesses")
+}
+
+model Customer {
+  id          String   @id @default(uuid()) @db.Uuid
+  business_id String   @db.Uuid
+  name        String   @db.VarChar(200)
+  phone       String?  @db.VarChar(20)
+  address     String?  @db.VarChar(500)
+  created_at  DateTime @default(now())
+
+  business Business  @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  invoices Invoice[]
+
+  @@index([business_id, phone])
+  @@map("customers")
+}
+
+model Invoice {
+  id             String        @id @default(uuid()) @db.Uuid
+  business_id    String        @db.Uuid
+  customer_id    String?       @db.Uuid
+  invoice_number String        @db.VarChar(50)
+  issue_date     DateTime      @default(now())
+  due_date       DateTime?
+  subtotal       Decimal       @db.Decimal(12, 2)
+  discount       Decimal       @default(0) @db.Decimal(12, 2)
+  tax            Decimal       @default(0) @db.Decimal(12, 2)
+  total          Decimal       @db.Decimal(12, 2)
+  currency       String        @default("NGN") @db.VarChar(5)
+  status         InvoiceStatus @default(draft)
+  pdf_url        String?
+  note           String?       @db.VarChar(1000)
+  metadata       Json?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  business Business      @relation(fields: [business_id], references: [id], onDelete: Cascade)
+  customer Customer?     @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  items    InvoiceItem[]
+
+  @@index([business_id, invoice_number])
+  @@index([created_at])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id         String  @id @default(uuid()) @db.Uuid
+  invoice_id String  @db.Uuid
+  name       String  @db.VarChar(200)
+  quantity   Decimal @db.Decimal(10, 2)
+  unit_price Decimal @db.Decimal(12, 2)
+  total      Decimal @db.Decimal(12, 2)
+
+  invoice Invoice @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model Upload {
+  id          String   @id @default(uuid()) @db.Uuid
+  business_id String?  @db.Uuid
+  file_type   String   @db.VarChar(50)
+  url         String
+  created_at  DateTime @default(now())
+
+  business Business? @relation(fields: [business_id], references: [id], onDelete: SetNull)
+
+  @@map("uploads")
+}
+
+enum InvoiceStatus {
+  draft
+  processing
+  ready
+  failed
+}

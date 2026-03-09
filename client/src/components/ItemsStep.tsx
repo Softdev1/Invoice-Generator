@@ -39,20 +39,32 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">Invoice Items</h2>
-      <p className="text-gray-500 text-sm">Add items or services you provided.</p>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="animate-fade-in-up">
+        <h2 className="section-title">Invoice Items</h2>
+        <p className="section-subtitle">What did you sell or provide?</p>
+      </div>
 
       {items.map((item, i) => (
-        <div key={i} className="card space-y-3">
+        <div key={i} className="card space-y-3 animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
           <div className="flex justify-between items-center">
-            <span className="text-sm font-semibold text-gray-500">Item {i + 1}</span>
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                {i + 1}
+              </span>
+              <span className="text-sm font-semibold text-slate-500">Item</span>
+            </div>
             {items.length > 1 && (
-              <button type="button" onClick={() => removeItem(i)} className="text-red-500 text-sm font-medium">
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="text-rose-500 text-sm font-semibold hover:text-rose-600 transition-colors"
+              >
                 Remove
               </button>
             )}
           </div>
+
           <input
             type="text"
             className="input-field"
@@ -61,9 +73,10 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
             onChange={(e) => updateItem(i, 'name', e.target.value)}
             required
           />
+
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs text-gray-500 mb-1">Quantity</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Quantity</label>
               <input
                 type="number"
                 className="input-field"
@@ -74,7 +87,7 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
               />
             </div>
             <div className="flex-1">
-              <label className="block text-xs text-gray-500 mb-1">Unit Price</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Unit Price</label>
               <input
                 type="number"
                 className="input-field"
@@ -85,21 +98,31 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
               />
             </div>
           </div>
-          <div className="text-right text-sm text-gray-500">
-            Line total: <span className="font-semibold text-gray-900">{(item.quantity * item.unit_price).toLocaleString()}</span>
+
+          <div className="text-right">
+            <span className="badge bg-slate-100 text-slate-700">
+              Line total: {(item.quantity * item.unit_price).toLocaleString()}
+            </span>
           </div>
         </div>
       ))}
 
-      <button type="button" onClick={addItem} className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-primary-400 hover:text-primary-600 transition-colors">
+      <button
+        type="button"
+        onClick={addItem}
+        className="w-full py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-500 font-semibold hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50 transition-all animate-fade-in-up"
+      >
         + Add Another Item
       </button>
 
       {/* Discount & Tax */}
-      <div className="card space-y-3">
+      <div className="card space-y-4 animate-fade-in-up">
+        <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+          <span className="text-sm font-semibold text-slate-500">Adjustments</span>
+        </div>
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1">Discount</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">Discount</label>
             <input
               type="number"
               className="input-field"
@@ -110,7 +133,7 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1">Tax</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">Tax</label>
             <input
               type="number"
               className="input-field"
@@ -124,32 +147,34 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
       </div>
 
       {/* Totals */}
-      <div className="card">
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>Subtotal</span>
-          <span>{subtotal.toLocaleString()}</span>
-        </div>
-        {data.discount > 0 && (
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>Discount</span>
-            <span>-{data.discount.toLocaleString()}</span>
+      <div className="card-highlight animate-fade-in-up">
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-slate-500">
+            <span>Subtotal</span>
+            <span className="font-medium">{subtotal.toLocaleString()}</span>
           </div>
-        )}
-        {data.tax > 0 && (
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>Tax</span>
-            <span>+{data.tax.toLocaleString()}</span>
+          {data.discount > 0 && (
+            <div className="flex justify-between text-sm text-rose-500">
+              <span>Discount</span>
+              <span className="font-medium">-{data.discount.toLocaleString()}</span>
+            </div>
+          )}
+          {data.tax > 0 && (
+            <div className="flex justify-between text-sm text-slate-500">
+              <span>Tax</span>
+              <span className="font-medium">+{data.tax.toLocaleString()}</span>
+            </div>
+          )}
+          <div className="flex justify-between pt-3 mt-2 border-t-2 border-amber-200">
+            <span className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Fraunces, serif' }}>Total</span>
+            <span className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Fraunces, serif' }}>{total.toLocaleString()}</span>
           </div>
-        )}
-        <div className="flex justify-between text-lg font-bold mt-2 pt-2 border-t">
-          <span>Total</span>
-          <span>{total.toLocaleString()}</span>
         </div>
       </div>
 
       {/* Note */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
+      <div className="animate-fade-in-up">
+        <label className="label">Note (optional)</label>
         <textarea
           className="input-field"
           rows={2}
@@ -159,7 +184,7 @@ export function ItemsStep({ data, onChange, onNext, onBack }: Props) {
         />
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 pt-2 animate-fade-in-up">
         <button type="button" onClick={onBack} className="btn-secondary">
           Back
         </button>
